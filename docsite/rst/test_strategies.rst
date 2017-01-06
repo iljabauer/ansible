@@ -19,18 +19,20 @@ also very easy to run the steps on the localhost or testing servers. Ansible let
 The Right Level of Testing
 ``````````````````````````
 
-Ansible resources are models of desired-state.  As such, it should not be necessary to test that services are running, packages are
+Ansible resources are models of desired-state.  As such, it should not be necessary to test that services are started, packages are
 installed, or other such things.  Ansible is the system that will ensure these things are declaratively true.   Instead, assert these
 things in your playbooks.
 
 .. code-block:: yaml
 
    tasks:
-     - service: name=foo state=running enabled=yes
+     - service: name=foo state=started enabled=yes
 
-If you think the service may not be running, the best thing to do is request it to be running.  If the service fails to start, Ansible
+If you think the service may not be started, the best thing to do is request it to be started.  If the service fails to start, Ansible
 will yell appropriately. (This should not be confused with whether the service is doing something functional, which we'll show more about how to
 do later).
+
+.. _check_mode_drift:
 
 Check Mode As A Drift Test
 ``````````````````````````
@@ -40,7 +42,7 @@ existing system, using the `--check` flag to the `ansible` command will report i
 bring the system into a desired state.
 
 This can let you know up front if there is any need to deploy onto the given system.  Ordinarily scripts and commands don't run in check mode, so if you
-want certain steps to always execute in check mode, such as calls to the script module, add the 'always_run' flag::
+want certain steps to always execute in check mode, such as calls to the script module, disable check mode for those tasks::
 
 
    roles:
@@ -48,7 +50,7 @@ want certain steps to always execute in check mode, such as calls to the script 
 
    tasks:
      - script: verify.sh
-       always_run: True
+       check_mode: no
 
 Modules That Are Useful for Testing
 ```````````````````````````````````
@@ -114,14 +116,14 @@ Testing Lifecycle
 
 If writing some degree of basic validation of your application into your playbooks, they will run every time you deploy.
 
-As such, deploying into a local development VM and a stage environment will both validate that things are according to plan
+As such, deploying into a local development VM and a staging environment will both validate that things are according to plan
 ahead of your production deploy.
 
 Your workflow may be something like this::
 
     - Use the same playbook all the time with embedded tests in development
-    - Use the playbook to deploy to a stage environment (with the same playbooks) that simulates production
-    - Run an integration test battery written by your QA team against stage
+    - Use the playbook to deploy to a staging environment (with the same playbooks) that simulates production
+    - Run an integration test battery written by your QA team against staging
     - Deploy to production, with the same integrated tests.
 
 Something like an integration test battery should be written by your QA team if you are a production webservice.  This would include
@@ -213,7 +215,7 @@ If desired, the above techniques may be extended to enable continuous deployment
 The workflow may look like this::
 
     - Write and use automation to deploy local development VMs
-    - Have a CI system like Jenkins deploy to a stage environment on every code change
+    - Have a CI system like Jenkins deploy to a staging environment on every code change
     - The deploy job calls testing scripts to pass/fail a build on every deploy
     - If the deploy job succeeds, it runs the same deploy playbook against production inventory
 
@@ -241,7 +243,7 @@ as part of a Continuous Integration/Continuous Delivery pipeline, as is covered 
 
 The focus should not be on infrastructure testing, but on application testing, so we strongly encourage getting together with your
 QA team and ask what sort of tests would make sense to run every time you deploy development VMs, and which sort of tests they would like
-to run against the stage environment on every deploy.  Obviously at the development stage, unit tests are great too.  But don't unit
+to run against the staging environment on every deploy.  Obviously at the development stage, unit tests are great too.  But don't unit
 test your playbook.  Ansible describes states of resources declaratively, so you don't have to.  If there are cases where you want
 to be sure of something though, that's great, and things like stat/assert are great go-to modules for that purpose.
 
@@ -256,7 +258,7 @@ system.
    :doc:`playbooks`
        An introduction to playbooks
    :doc:`playbooks_delegation`
-       Delegation, useful for working with loud balancers, clouds, and locally executed steps.
+       Delegation, useful for working with load balancers, clouds, and locally executed steps.
    `User Mailing List <http://groups.google.com/group/ansible-project>`_
        Have a question?  Stop by the google group!
    `irc.freenode.net <http://irc.freenode.net>`_

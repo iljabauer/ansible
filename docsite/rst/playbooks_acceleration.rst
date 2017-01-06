@@ -3,27 +3,30 @@ Accelerated Mode
 
 .. versionadded:: 1.3
 
+.. note::  
+
+     Accelerated mode is deprecated. Consider using SSH with ControlPersist and pipelining enabled instead. This feature will be removed in a future release. Deprecation warnings can be disabled by setting :code:`deprecation_warnings=False` in :code:`ansible.cfg`.
+
 You Might Not Need This!
 ````````````````````````
 
-Are you running Ansible 1.5 or later?  If so, you may not need accelerate mode due to a new feature called "SSH pipelining" and should read the :ref:`pipelining` section of the documentation.
+Are you running Ansible 1.5 or later?  If so, you may not need accelerated mode due to a new feature called "SSH pipelining" and should read the :ref:`pipelining` section of the documentation.
 
-For users on 1.5 and later, accelerate mode only makes sense if you (A) are managing from an Enterprise Linux 6 or earlier host
-   and still are on paramiko, or (B) can't enable TTYs with sudo as described in the pipelining docs.
+For users on 1.5 and later, accelerated mode only makes sense if you (A) are managing from an Enterprise Linux 6 or earlier host and still are on paramiko, or (B) can't enable TTYs with sudo as described in the pipelining docs.
 
 If you can use pipelining, Ansible will reduce the amount of files transferred over the wire, 
-making everything much more efficient, and performance will be on par with accelerate mode in nearly all cases, possibly excluding very large file transfer.   Because less moving parts are involved, pipelining is better than accelerate mode for nearly all use cases.
+making everything much more efficient, and performance will be on par with accelerated mode in nearly all cases, possibly excluding very large file transfer.   Because less moving parts are involved, pipelining is better than accelerated mode for nearly all use cases.
 
-Accelerate mode remains around in support of EL6
+Accelerated moded remains around in support of EL6
 control machines and other constrained environments.
 
-Accelerate Mode Details
-```````````````````````
+Accelerated Mode Details
+````````````````````````
 
 While OpenSSH using the ControlPersist feature is quite fast and scalable, there is a certain small amount of overhead involved in
 using SSH connections.  While many people will not encounter a need, if you are running on a platform that doesn't have ControlPersist support (such as an EL6 control machine), you'll probably be even more interested in tuning options.
 
-Accelerate mode is there to help connections work faster, but still uses SSH for initial secure key exchange.  There is no
+Accelerated mode is there to help connections work faster, but still uses SSH for initial secure key exchange.  There is no
 additional public key infrastructure to manage, and this does not require things like NTP or even DNS. 
 
 Accelerated mode can be anywhere from 2-6x faster than SSH with ControlPersist enabled, and 10x faster than paramiko.
@@ -33,13 +36,6 @@ to it via a socket connection. Ansible secures this communication by using a tem
 the SSH connection (this key is different for every host, and is also regenerated periodically). 
 
 By default, Ansible will use port 5099 for the accelerated connection, though this is configurable. Once running, the daemon will accept connections for 30 minutes, after which time it will terminate itself and need to be restarted over SSH.
-
-Accelerated mode offers several improvements over the (deprecated) original fireball mode from which it was based:
-
-* No bootstrapping is required, only a single line needs to be added to each play you wish to run in accelerated mode.
-* Support for sudo commands (see below for more details and caveats) is available.
-* There are fewer requirements. ZeroMQ is no longer required, nor are there any special packages beyond python-keyczar 
-* python 2.5 or higher is required.
 
 In order to use accelerated mode, simply add `accelerate: true` to your play::
 
@@ -57,7 +53,7 @@ In order to use accelerated mode, simply add `accelerate: true` to your play::
         - bar
         - baz
 
-If you wish to change the port Ansible will use for the accelerated connection, just add the `accelerated_port` option::
+If you wish to change the port Ansible will use for the accelerated connection, just add the `accelerate_port` option::
 
     ---
 

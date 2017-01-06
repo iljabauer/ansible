@@ -28,8 +28,8 @@ It is also possible to address a specific host or set of hosts by name::
 
     one.example.com
     one.example.com:two.example.com
-    192.168.1.50
-    192.168.1.*
+    192.0.2.50
+    192.0.2.*
 
 The following patterns address one or more groups.  Groups separated by a colon indicate an "OR" configuration.
 This means the host may be in either one group or the other::
@@ -68,13 +68,20 @@ It's also ok to mix wildcard patterns and groups at the same time::
 
     one*.com:dbservers
 
-As an advanced usage, you can also select the numbered server in a group::
-   
-    webservers[0]
+You can select a host or subset of hosts from a group by their position. For example, given the following group::
 
-Or a portion of servers in a group::
+    [webservers]
+    cobweb
+    webbing
+    weber
 
-    webservers[0:25]
+You can refer to hosts within the group by adding a subscript to the group name::
+
+    webservers[0]       # == cobweb
+    webservers[-1]      # == weber
+    webservers[0:1]     # == webservers[0],webservers[1]
+                        # == cobweb,webbing
+    webservers[1:]      # == webbing,weber
 
 Most people don't specify patterns as regular expressions, but you can.  Just start the pattern with a '~'::
 
@@ -90,6 +97,9 @@ And if you want to read the list of hosts from a file, prefix the file name with
 
 Easy enough.  See :doc:`intro_adhoc` and then :doc:`playbooks` for how to apply this knowledge.
 
+.. note:: With the exception of version 1.9, you can use ',' instead of ':' as a host list separator. The ',' is preferred specially when dealing with ranges and ipv6.
+.. note:: As of 2.0 the ';' is deprecated as a host list separator.
+
 .. seealso::
 
    :doc:`intro_adhoc`
@@ -100,4 +110,3 @@ Easy enough.  See :doc:`intro_adhoc` and then :doc:`playbooks` for how to apply 
        Questions? Help? Ideas?  Stop by the list on Google Groups
    `irc.freenode.net <http://irc.freenode.net>`_
        #ansible IRC chat channel
-
