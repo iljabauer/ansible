@@ -156,9 +156,13 @@ def load_list_of_tasks(ds, play, block=None, role=None, task_include=None, use_h
                     if use_handlers:
                         subdir = 'handlers'
                     while parent_include is not None:
-                        source_file = parent_include.get_ds()._data_source
+                        source_file = ""
 
-                        parent_is_symlink = os.path.islink(source_file)
+                        parent_is_symlink = False
+                        if hasattr(parent_include, '_ds') and hasattr(parent_include._ds, '_data_source'):
+                            source_file = parent_include.get_ds()._data_source
+                            parent_is_symlink = os.path.islink(source_file)
+
                         parent_is_include = isinstance(parent_include, TaskInclude)
                         if not parent_is_include and not parent_is_symlink:
                             parent_include = parent_include._parent
