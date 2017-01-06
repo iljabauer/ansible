@@ -440,7 +440,9 @@ class Task(Base, Conditional, Taggable, Become):
             path_stack.append(task_dir)
 
         # add real path if data source is a symlink
-        source_file = self.get_ds()._data_source
+        source_file = ""
+        if hasattr(self, '_ds') and hasattr(self._ds, '_data_source'):
+            source_file = self.get_ds()._data_source
         if os.path.islink(source_file):
             real_path = unfrackpath(source_file)
             real_path_directory = os.path.dirname(real_path)
